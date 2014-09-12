@@ -473,6 +473,9 @@ class DeploymentOutputStream(View):
             self.object.save()
 
             deployment_finished.send(self.object, deployment_id=self.object.pk)
+            if getattr(settings, 'EMAIL_NOTIFICATION', True):
+                subject = 'User {0} just started deploy {1} on project {2}'.format(self.request.user, self.object.task.name, self.object.stage.project,)
+                send_mail(subject, all_output,'fabricbolt@cvc.com.br', settings.EMAIL_RECEIVER, fail_silently=False)
 
         except Exception as e:
             message = "An error occurred: " + e.message
